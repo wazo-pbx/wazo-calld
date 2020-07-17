@@ -122,7 +122,7 @@ class Conference:
         try:
             conference = confd_client.conferences.get(conference_id)
         except HTTPError as e:
-            if e.response and e.response.status_code == 404:
+            if e.response is not None and e.response.status_code == 404:
                 raise NoSuchConferenceID(conference_id)
             raise
         return cls(conference['tenant_uuid'],

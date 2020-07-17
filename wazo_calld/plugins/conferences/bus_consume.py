@@ -4,6 +4,7 @@
 import logging
 
 from wazo_calld.plugin_helpers.confd import Conference
+from wazo_calld.plugin_helpers.exceptions import NoSuchConferenceID
 
 from .schemas import participant_schema
 
@@ -28,6 +29,12 @@ class ConferencesBusEventHandler:
 
     def _notify_participant_joined(self, event):
         conference_id = int(event['Conference'])
+        try:
+            conference = Conference.from_id(conference_id, self._confd)
+        except NoSuchConferenceID:
+            logger.debug('Ignored participant joining conference %s: no such conference ID', conference_id)
+            return
+
         logger.debug('Participant joined conference %s', conference_id)
         raw_participant = {
             'id': event['Uniqueid'],
@@ -42,7 +49,6 @@ class ConferencesBusEventHandler:
         }
 
         participant = participant_schema.load(raw_participant)
-        conference = Conference.from_id(conference_id, self._confd)
 
         participants_already_present = self._service.list_participants(conference.tenant_uuid,
                                                                        conference_id)
@@ -51,6 +57,12 @@ class ConferencesBusEventHandler:
 
     def _notify_participant_left(self, event):
         conference_id = int(event['Conference'])
+        try:
+            conference = Conference.from_id(conference_id, self._confd)
+        except NoSuchConferenceID:
+            logger.debug('Ignored participant joining conference %s: no such conference ID', conference_id)
+            return
+
         logger.debug('Participant left conference %s', conference_id)
         raw_participant = {
             'id': event['Uniqueid'],
@@ -65,8 +77,6 @@ class ConferencesBusEventHandler:
         }
 
         participant = participant_schema.load(raw_participant)
-
-        conference = Conference.from_id(conference_id, self._confd)
 
         participants_already_present = self._service.list_participants(conference.tenant_uuid,
                                                                        conference_id)

@@ -1,4 +1,4 @@
-# Copyright 2015-2019 The Wazo Authors  (see the AUTHORS file)
+# Copyright 2015-2020 The Wazo Authors  (see the AUTHORS file)
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from wazo_calld.exceptions import APIException
@@ -26,7 +26,7 @@ class NotEnoughChannels(Exception):
 class NoSuchConferenceID(Exception):
     def __init__(self, conference_id):
         self.conference_id = conference_id
-        super('No such conference ID "{}"'.format(conference_id))
+        super().__init__('No such conference ID "{}"'.format(conference_id))
 
 
 class UserMissingMainLine(APIException):
